@@ -1,0 +1,27 @@
+# Python
+backend/.venv/
+backend/.myenv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Local runtime data & secrets
+backend/pharma.db
+backend/pharma.db-journal
+backend/pharma.db-wal
+backend/.env
+
+# Node / Vite
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+
+# TS build cache
+*.tsbuildinfo
+
+# SSH keys — never commit
+*.pem
