@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
-from . import dashboard, models, runtime
+from . import dashboard, models, runtime, uns as uns_mod
 from .agents.registry import AGENTS, DOMAINS, FRAMEWORKS, get_agent, domain_of
 from .config import ORCH_AUTOSTART, ORCH_AUTOSTART_MODE, STATIC_DIR
 from .database import Base, SessionLocal
@@ -260,6 +260,61 @@ def dashboard_kpis():
     db = SessionLocal()
     try:
         return dashboard.plant_kpis(db)
+    finally:
+        db.close()
+
+
+# --------------------------------------------------------- Unified Namespace
+@app.get("/api/uns/systems")
+def uns_systems():
+    db = SessionLocal()
+    try:
+        return uns_mod.systems(db)
+    finally:
+        db.close()
+
+
+@app.get("/api/uns/stats")
+def uns_stats():
+    db = SessionLocal()
+    try:
+        return uns_mod.stats(db)
+    finally:
+        db.close()
+
+
+@app.get("/api/uns/tree")
+def uns_tree():
+    db = SessionLocal()
+    try:
+        return uns_mod.tree(db)
+    finally:
+        db.close()
+
+
+@app.get("/api/uns/events")
+def uns_events(limit: int = 60):
+    db = SessionLocal()
+    try:
+        return {"events": uns_mod.recent_events(db, limit)}
+    finally:
+        db.close()
+
+
+@app.get("/api/uns/batches")
+def uns_batches(n: int = 12):
+    db = SessionLocal()
+    try:
+        return {"batches": uns_mod.recent_batches(db, n)}
+    finally:
+        db.close()
+
+
+@app.get("/api/uns/batch/{batch_id}")
+def uns_batch(batch_id: str):
+    db = SessionLocal()
+    try:
+        return uns_mod.batch_360(db, batch_id)
     finally:
         db.close()
 

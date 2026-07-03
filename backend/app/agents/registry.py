@@ -199,6 +199,14 @@ AGENTS: list[dict] = [
                "report_generator_tool", "pharma_alert_tool"],
      "escalation": "OOT signal on critical CQA -> QA Director; stability failure -> Regulatory Affairs",
      "sends_to": ["QA-P02", "ME-P06"], "receives_from": ["QA-P01"]},
+    {"id": "QA-P06", "name": "MES-LIMS Integration & Data Integrity Agent", "domain": "QA",
+     "framework": "Reflect-and-Correct", "depth": "full",
+     "goal": "Close the gaps between LIMS, MES, and QMS: reconcile lab results into batch records, catch broken handoffs, and enforce ALCOA+ data integrity across systems.",
+     "triggers": ["QC result posted in LIMS", "Batch record closing", "Hourly integrity scan", "Handoff SLA breach"],
+     "tools": ["lims_mes_reconciliation_tool", "alcoa_integrity_scan_tool",
+               "cross_system_reconciliation_tool", "raise_deviation", "audit_trail_tool"],
+     "escalation": "ALCOA+ integrity breach on a GMP record -> QA Director + potential data-integrity deviation",
+     "sends_to": ["QA-P02", "QA-P03", "ME-P06"], "receives_from": ["QA-P01", "ME-P02", "ME-P05"]},
 
     # --------------------------------------------- Equipment & Compliance Mgmt
     {"id": "EQ-P01", "name": "Equipment Qualification Agent", "domain": "EQ",

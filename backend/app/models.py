@@ -740,3 +740,17 @@ class SimClock(Base):
     current_time = Column(DateTime)
     tick = Column(Integer, default=0)
     running = Column(Boolean, default=False)
+
+
+class UNSEvent(Base):
+    """Append-only Unified Namespace event log — each source system's published
+    state change, unified under one ISA-95 topic (the single source of truth)."""
+    __tablename__ = "uns_event"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tick = Column(Integer, index=True)
+    sim_time = Column(DateTime, index=True)
+    topic = Column(String)
+    source = Column(String)          # publishing system id (mes, lims, qms, ...)
+    value = Column(String)
+    status = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)

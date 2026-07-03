@@ -25,3 +25,6 @@ Thumbs.db
 
 # SSH keys — never commit
 *.pem
+
+# Presentations / binaries
+*.pptx

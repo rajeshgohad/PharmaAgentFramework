@@ -9,6 +9,8 @@ import Orchestrator from "./pages/Orchestrator";
 import Dashboards from "./pages/Dashboards";
 import Toolkit from "./pages/Toolkit";
 import Tables from "./pages/Tables";
+import Fit from "./pages/Fit";
+import UNS from "./pages/UNS";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -17,6 +19,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/catalog" replace />} />
           <Route path="catalog" element={<Catalog />} />
+          <Route path="fit" element={<Fit />} />
+          <Route path="uns" element={<UNS />} />
           <Route path="agent/:id" element={<AgentPage />} />
           <Route path="orchestrator" element={<Orchestrator />} />
           <Route path="dashboards" element={<Dashboards />} />

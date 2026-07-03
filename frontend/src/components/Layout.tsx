@@ -5,6 +5,8 @@ import ApiKeyModal from "./ApiKeyModal";
 
 const tabs = [
   { to: "/catalog", label: "Agent Catalog", icon: "▦" },
+  { to: "/fit", label: "Strategic Fit", icon: "🎯" },
+  { to: "/uns", label: "Unified Namespace", icon: "⬡" },
   { to: "/orchestrator", label: "Orchestrator", icon: "◎" },
   { to: "/dashboards", label: "Dashboards", icon: "📊" },
   { to: "/toolkit", label: "Toolkit", icon: "🛠" },

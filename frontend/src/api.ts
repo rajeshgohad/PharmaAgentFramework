@@ -59,4 +59,10 @@ export const api = {
   clearApiKey: () => fetch("/api/config/api-key", { method: "DELETE" }).then(j),
   tables: () => fetch("/api/tables").then(j),
   tableData: (name: string) => fetch(`/api/tables/${name}`).then(j),
+  unsSystems: () => fetch("/api/uns/systems").then(j),
+  unsStats: () => fetch("/api/uns/stats").then(j),
+  unsTree: () => fetch("/api/uns/tree").then(j),
+  unsEvents: (limit = 60) => fetch(`/api/uns/events?limit=${limit}`).then(j),
+  unsBatches: () => fetch("/api/uns/batches").then(j),
+  unsBatch: (id: string) => fetch(`/api/uns/batch/${id}`).then(j),
 };

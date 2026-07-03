@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import func
 
-from . import models
+from . import models, uns as uns_mod
 from .config import ORCH_MINUTES_PER_TICK, ORCH_TICK_SECONDS, THRESHOLDS
 from .database import SessionLocal
 from .reasoning import run_agent
@@ -30,6 +30,7 @@ CASCADES = {
     "DEVIATION_CRITICAL": ["ME-P04", "QA-P03"],
     "EM_ACTION": ["REG-P02", "QA-P02"],
     "TEMP_EXCURSION": ["WM-P04", "QA-P02"],
+    "INTEGRITY_GAP": ["QA-P06", "QA-P03"],
 }
 
 
@@ -117,6 +118,12 @@ class Orchestrator:
             self._emit({"type": "tick", "tick": tick, "sim_time": str(sim_time),
                         "emitted": emitted})
 
+            # UNS: each source system publishes this tick's new state to the namespace
+            uns_events = uns_mod.publish_from_tick(db, sim_time, tick, ORCH_MINUTES_PER_TICK)
+            if uns_events:
+                self._emit({"type": "uns", "tick": tick, "sim_time": str(sim_time),
+                            "count": len(uns_events), "events": uns_events[:25]})
+
             signals = self._detect(db, sim_time, tick)
             dispatched = []
             for sig in signals:
@@ -199,6 +206,23 @@ class Orchestrator:
                 "desc": (f"Temperature excursion on {t.storage_unit_id} "
                          f"({t.temperature_c}°C, limit {t.temperature_usl}°C)."),
                 "context": {"area_id": t.area_id}})
+
+        # 6) data-integrity / MES-LIMS handoff gap: new LIMS results posted this tick
+        #    with no second-person review (ALCOA+) and not yet reconciled into MES.
+        unreviewed = (db.query(models.AnalyticalResult)
+                      .filter(models.AnalyticalResult.run_date >= window_start,
+                              models.AnalyticalResult.reviewer_id.is_(None)).all())
+        seen_int = set()
+        for r in unreviewed:
+            if r.batch_id in seen_int:
+                continue
+            seen_int.add(r.batch_id)
+            signals.append({
+                "type": "INTEGRITY_GAP", "severity": "ALERT",
+                "source_table": "analytical_result", "source_ref": r.batch_id,
+                "desc": (f"New LIMS results on batch {r.batch_id} posted without second-person "
+                         f"review (ALCOA+) and awaiting MES reconciliation."),
+                "context": {"batch_id": r.batch_id}})
 
         # de-duplicate within the tick, then suppress anything already handled
         # for the same source within the cooldown window (avoid re-firing a
